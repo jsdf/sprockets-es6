@@ -1,45 +1,27 @@
 require 'babel/transpiler'
 require 'sprockets'
 require 'sprockets/es6/version'
+require 'tilt'
 
 module Sprockets
-  class ES6
-    def self.instance
-      @instance ||= new
+  class ES6 < Tilt::Template
+    def prepare
     end
 
-    def self.call(input)
-      instance.call(input)
-    end
-
-    def initialize(options = {})
-      @options = options.dup.freeze
-
-      @cache_key = [
-        self.class.name,
-        Babel::Transpiler.version,
-        Babel::Transpiler.source_version,
-        VERSION,
-        @options
-      ].freeze
-    end
-
-    def call(input)
-      data = input[:data]
-      result = input[:cache].fetch(@cache_key + [data]) do
-        Babel::Transpiler.transform(data, @options.merge(
-          'sourceRoot' => input[:load_path],
-          'moduleRoot' => '',
-          'filename' => input[:filename],
-          'filenameRelative' => input[:environment].split_subpath(input[:load_path], input[:filename])
-        ))
+    def evaluate(scope, locals, &block)
+      if scope.pathname.to_s.include? 'vendor'
+        data
+      else
+        result = Babel::Transpiler.transform(data, {
+          'filename' => scope.pathname.to_s,
+        })
+        result['code']
       end
-      result['code']
+    end
+
+    def self.install(environment = ::Sprockets)
+      environment.append_path Babel::Transpiler.source_path
+      environment.register_preprocessor 'application/javascript', Sprockets::ES6
     end
   end
-
-  append_path Babel::Transpiler.source_path
-  register_mime_type 'text/ecmascript-6', extensions: ['.es6'], charset: :unicode
-  register_transformer 'text/ecmascript-6', 'application/javascript', ES6
-  register_preprocessor 'text/ecmascript-6', DirectiveProcessor
 end
