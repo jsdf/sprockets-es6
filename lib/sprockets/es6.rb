@@ -8,20 +8,43 @@ module Sprockets
     def prepare
     end
 
-    def evaluate(scope, locals, &block)
-      if scope.pathname.to_s.include? 'vendor'
-        data
+    def self.babel_options
+      @babel_options || {}
+    end
+
+    def self.ignore_pattern
+      @ignore_pattern
+    end
+
+    def ignored?(filepath)
+      if self.class.ignore_pattern
+        filepath =~ self.class.ignore_pattern
       else
-        result = Babel::Transpiler.transform(data, {
-          'filename' => scope.pathname.to_s,
-        })
-        result['code']
+        false
       end
     end
 
-    def self.install(environment = ::Sprockets)
+    def evaluate(scope, locals, &block)
+      return data if ignored?(scope.pathname.to_s)
+
+      result = Babel::Transpiler.transform(
+        data,
+        self.class.babel_options.merge({
+          'filename' => scope.pathname.to_s,
+        })
+      )
+      result['code']
+    end
+
+    def self.install(environment = ::Sprockets, &block)
+      preprocessor_class = if block_given?
+        Class.new(Sprockets::ES6, &block)
+      else
+        Sprockets::ES6
+      end
+
       environment.append_path Babel::Transpiler.source_path
-      environment.register_preprocessor 'application/javascript', Sprockets::ES6
+      environment.register_preprocessor 'application/javascript', preprocessor_class
     end
   end
 end
