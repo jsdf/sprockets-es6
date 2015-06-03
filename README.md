@@ -16,6 +16,8 @@ gem 'sprockets-es6', git: "git@github.com:jsdf/sprockets-es6.git", :branch => 's
 
 ``` ruby
 require 'sprockets/es6'
+
+Sprockets::ES6.install
 ```
 
 ``` js
