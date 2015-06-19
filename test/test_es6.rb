@@ -6,6 +6,9 @@ class TestES6 < MiniTest::Test
   def setup
     @env = Sprockets::Environment.new
     @env.append_path File.expand_path("../fixtures", __FILE__)
+    Sprockets::ES6.install(@env) do
+      @babel_options = {'blacklist' => ["spec.functionName"] }
+    end
   end
 
   def test_transform_arrow_function
@@ -21,7 +24,6 @@ var square = function (n) {
   end
 
   def test_common_modules
-    register Sprockets::ES6.new('modules' => 'common')
     assert asset = @env["mod.js"]
     assert_equal 'application/javascript', asset.content_type
     assert_equal <<-JS.chomp, asset.to_s.strip
@@ -29,63 +31,5 @@ var square = function (n) {
 
 require("foo");
     JS
-  end
-
-  def test_amd_modules
-    register Sprockets::ES6.new('modules' => 'amd')
-    assert asset = @env["mod.js"]
-    assert_equal 'application/javascript', asset.content_type
-    assert_equal <<-JS.chomp, asset.to_s.strip
-define(["exports", "foo"], function (exports, _foo) {
-  "use strict";
-});
-    JS
-  end
-
-  def test_amd_modules_with_ids
-    register Sprockets::ES6.new('modules' => 'amd', 'moduleIds' => true)
-    assert asset = @env["mod.js"]
-    assert_equal 'application/javascript', asset.content_type
-    assert_equal <<-JS.chomp, asset.to_s.strip
-define("mod", ["exports", "foo"], function (exports, _foo) {
-  "use strict";
-});
-    JS
-  end
-
-  def test_system_modules
-    register Sprockets::ES6.new('modules' => 'system')
-    assert asset = @env["mod.js"]
-    assert_equal 'application/javascript', asset.content_type
-    assert_equal <<-JS.chomp, asset.to_s.strip
-System.register(["foo"], function (_export) {
-  "use strict";
-
-  return {
-    setters: [function (_foo) {}],
-    execute: function () {}
-  };
-});
-    JS
-  end
-
-  def test_system_modules_with_ids
-    register Sprockets::ES6.new('modules' => 'system', 'moduleIds' => true)
-    assert asset = @env["mod.js"]
-    assert_equal 'application/javascript', asset.content_type
-    assert_equal <<-JS.chomp, asset.to_s.strip
-System.register("mod", ["foo"], function (_export) {
-  "use strict";
-
-  return {
-    setters: [function (_foo) {}],
-    execute: function () {}
-  };
-});
-    JS
-  end
-
-  def register(processor)
-    @env.register_transformer 'text/ecmascript-6', 'application/javascript', processor
   end
 end
