@@ -19,9 +19,9 @@ module Sprockets
       @ignore_matcher ||= begin
         if ignore_pattern.nil?
           Proc.new { false }
-        elsif ignore_pattern.respond_to? :=~
-          Proc.new { |filepath| filepath =~ ignore_pattern }
-        elsif ignore_pattern.respond_to? :include?
+        elsif ignore_pattern.respond_to? :match
+          Proc.new { |filepath| !!ignore_pattern.match(filepath) }
+        elsif ignore_pattern.is_a? String
           Proc.new { |filepath| filepath.include? ignore_pattern }
         else
           raise StandardError, "Don't know how to compare filepath with #{ignore_pattern}"
