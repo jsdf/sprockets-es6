@@ -21,6 +21,8 @@ require 'sprockets/es6'
 Sprockets::ES6.install do
   # any file paths matching this won't be processed
   @ignore_pattern = /vendor/
+  # or
+  @ignore_matcher = Proc.new { |filepath| !filepath.include?('app/assets/javascripts') }
   # babel options as per https://babeljs.io/docs/usage/options/
   @babel_options = {
     'loose' => ['es6.classes', 'es6.properties.computed', 'es6.modules'],

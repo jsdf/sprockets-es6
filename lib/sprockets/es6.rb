@@ -8,16 +8,30 @@ module Sprockets
     end
 
     def self.babel_options
-      @babel_options || {}
+      @babel_options ||= {}
     end
 
     def self.ignore_pattern
-      @ignore_pattern
+      @ignore_pattern ||= nil
+    end
+
+    def self.ignore_matcher
+      @ignore_matcher ||= begin
+        if ignore_pattern.nil?
+          Proc.new { false }
+        elsif ignore_pattern.respond_to? :=~
+          Proc.new { |filepath| filepath =~ ignore_pattern }
+        elsif ignore_pattern.respond_to? :include?
+          Proc.new { |filepath| filepath.include? ignore_pattern }
+        else
+          raise StandardError, "Don't know how to compare filepath with #{ignore_pattern}"
+        end
+      end
     end
 
     def ignored?(filepath)
-      if self.class.ignore_pattern
-        filepath =~ self.class.ignore_pattern
+      if self.class.ignore_matcher
+        self.class.ignore_matcher.call(filepath)
       else
         false
       end
