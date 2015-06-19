@@ -1,6 +1,5 @@
 require 'babel/transpiler'
 require 'sprockets'
-require 'sprockets/es6/version'
 require 'tilt'
 
 module Sprockets

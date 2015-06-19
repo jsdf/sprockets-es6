@@ -1,11 +1,10 @@
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'sprockets/es6/version'
 
 Gem::Specification.new do |s|
   s.name    = 'sprockets-es6'
-  s.version = Sprockets::ES6::VERSION
+  s.version = '0.6.2.sprockets2'
 
-  s.homepage    = "https://github.com/TannerRogalsky/sprockets-es6"
+  s.homepage    = "https://github.com/jsdf/sprockets-es6"
   s.summary     = "Sprockets ES6 transformer"
   s.description = <<-EOS
     A Sprockets transformer that converts ES6 code into vanilla ES5 with Babel JS.
@@ -21,10 +20,10 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'babel-transpiler'
   s.add_dependency 'sprockets', '~> 2.12'
-  s.add_dependency 'tilt'
+  s.add_dependency "tilt", ["~> 1.1", "!= 1.3.0"]
   s.add_development_dependency 'rake'
   s.add_development_dependency 'minitest'
 
-  s.authors = ['Joshua Peek']
-  s.email   = 'josh@joshpeek.com'
+  s.authors = ['Joshua Peek', 'James Friend']
+  s.email   = 'james@jsdf.co'
 end
