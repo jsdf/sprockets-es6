@@ -2,7 +2,7 @@ $:.unshift File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name    = 'sprockets-es6'
-  s.version = '0.6.2.sprockets2'
+  s.version = '0.6.3.sprockets2'
 
   s.homepage    = "https://github.com/jsdf/sprockets-es6"
   s.summary     = "Sprockets ES6 transformer"
