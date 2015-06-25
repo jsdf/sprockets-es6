@@ -13,7 +13,6 @@ gem 'sprockets', '~> 2.12'
 gem 'sprockets-es6', git: "git@github.com:jsdf/sprockets-es6.git", :branch => 'sprockets2'
 ```
 
-
 ``` ruby
 require 'sprockets/es6'
 
@@ -46,4 +45,28 @@ class Animal {
     this.name = name
   }
 }
+```
+
+Be sure to include the language features polyfill:
+``` js
+// common.js
+//= require babel/polyfill
+```
+
+Also, you can optionally include the babel helpers in a common file, rather than
+having them output inline:
+
+``` js
+// common.js
+//= require babel/polyfill
+//= require babel/external-helpers
+```
+
+```ruby
+Sprockets::ES6.install do
+
+  @babel_options = {
+    'externalHelpers' => true,
+  }
+end
 ```
